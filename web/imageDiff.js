@@ -1,10 +1,19 @@
 /* 差分画像をJSで生成 */
 
-function loadImage(src) {
+function loadImageUrl(src) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.src = src;
+  });
+}
+
+function loadImageFile(file) {
+  
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = URL.createObjectURL(file);
   });
 }
 
@@ -67,33 +76,36 @@ function compareImages(data1, data2, width, height, diffCtx, options = {}) {
   diffCtx.putImageData(diffImage, 0, 0);
 }
 
+
+function main() {
 // 実行部分
-(async () => {
-  const [img1, img2] = await Promise.all([
-    loadImage('image1.png'),
-    loadImage('image2.png')
-  ]);
+  (async () => {
+    const [img1, img2] = await Promise.all([
+      loadImage('image1.png'),
+      loadImage('image2.png')
+    ]);
 
-  const canvas1 = document.createElement('canvas');
-  const canvas2 = document.createElement('canvas');
-  const diffCanvas = document.createElement('canvas');
-  const ctx1 = canvas1.getContext('2d');
-  const ctx2 = canvas2.getContext('2d');
-  const diffCtx = diffCanvas.getContext('2d');
+    const canvas1 = document.createElement('canvas');
+    const canvas2 = document.createElement('canvas');
+    const diffCanvas = document.createElement('canvas');
+    const ctx1 = canvas1.getContext('2d');
+    const ctx2 = canvas2.getContext('2d');
+    const diffCtx = diffCanvas.getContext('2d');
 
-  try {
-    const { width, height, data1, data2 } = validateImages(img1, img2, ctx1, ctx2);
-    diffCanvas.width = width;
-    diffCanvas.height = height;
+    try {
+      const { width, height, data1, data2 } = validateImages(img1, img2, ctx1, ctx2);
+      diffCanvas.width = width;
+      diffCanvas.height = height;
 
-    compareImages(data1, data2, width, height, diffCtx, {
-      threshold: 10,             // 誤差許容（0〜1020まで、通常10〜50程度でよい）
-      highlightColor: [0, 255, 0, 255] // 差分を緑色で表示する例
-    });
+      compareImages(data1, data2, width, height, diffCtx, {
+        threshold: 10,             // 誤差許容（0〜1020まで、通常10〜50程度でよい）
+        highlightColor: [0, 255, 0, 255] // 差分を緑色で表示する例
+      });
 
-    document.body.appendChild(diffCanvas);
-  } catch (e) {
-    console.error(e.message);
-  }
-})();
+      document.body.appendChild(diffCanvas);
+    } catch (e) {
+      console.error(e.message);
+    }
+  })();
 
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="imageDiff.js"></script>
+
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Image Diff Checker</title>
+	<link rel="stylesheet" href="styles.css">	
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+	<div class="container mx-auto p-4">
+		<h1 class="text-3xl font-bold mb-4">Image Diff Checker</h1>
+		<p class="mb-4">Upload two images to compare them.</p>
+		<div class="flex space-x-4">
+			<input type="file" id="image1" accept="image/*" class="border border-gray-300 p-2 rounded">
+			<input type="file" id="image2" accept="image/*" class="border border-gray-300 p-2 rounded">
+			<button id="compareBtn" class="bg-blue-500 text-white p-2 rounded">Compare</button>
+		</div>
+		<div id="result" class="mt-4">
+			
+			<canvas style="float:left;" id="canvas1" class="border border-gray-300 "></canvas>
+			<canvas style="float:left;" id="canvas2" class="border border-gray-300 "></canvas>
+			<canvas style="float:left;" id="canvas3" class="border border-gray-300 "></canvas>
+
+		</div>
+	</div>
+	<script>
+		document.getElementById('compareBtn').addEventListener('click',async function() {
+			console.log( "compareBtn clicked");
+			const image1 = document.getElementById('image1').files[0];
+			const image2 = document.getElementById('image2').files[0];
+			console.log("image1: ", image1);
+			console.log("image2: ", image2);
+			if (!image1 || !image2) {
+				alert('Please select two images to compare.');
+				return;
+			}
+
+		    const [img1, img2] = await Promise.all([
+		      loadImageFile(image1),
+		      loadImageFile(image2)
+		    ]);
+				
+			const canvas1 = document.getElementById('canvas1')
+			const canvas2 = document.getElementById('canvas2')
+			const diffCanvas = document.getElementById('canvas3')
+		    const ctx1 = canvas1.getContext('2d');
+		    const ctx2 = canvas2.getContext('2d');
+		    const diffCtx = diffCanvas.getContext('2d');
+				
+		    try {
+		      const { width, height, data1, data2 } = validateImages(img1, img2, ctx1, ctx2);
+		      diffCanvas.width = width;
+		      diffCanvas.height = height;
+			
+		      compareImages(data1, data2, width, height, diffCtx, {
+		        threshold: 10,             // 誤差許容（0〜1020まで、通常10〜50程度でよい）
+		        highlightColor: [0, 255, 0, 255] // 差分を緑色で表示する例
+		      });
+		      //document.body.appendChild(diffCanvas);
+    		} catch (e) {
+     		 console.error(e.message);
+    		}
+  		});
+		/*	
+			const image1 = document.getElementById('image1').files[0];
+			const image2 = document.getElementById('image2').files[0];
+
+			if (!image1 || !image2) {
+				alert('Please select two images to compare.');
+				return;
+			}
+
+			const reader1 = new FileReader();
+			const reader2 = new FileReader();
+
+			reader1.onload = function(event) {
+				const img1 = new Image();
+				img1.src = event.target.result;
+
+				reader2.onload = function(event) {
+					const img2 = new Image();
+					img2.src = event.target.result;
+
+					img1.onload = function() {
+						img2.onload = function() {
+							const diffCanvas = createDiffCanvas(img1, img2);
+							document.getElementById('result').innerHTML = '';
+							document.getElementById('result').appendChild(diffCanvas);
+						};
+					};
+				};
+
+				reader2.readAsDataURL(image2);
+			};
+
+			reader1.readAsDataURL(image1);
+		});
+		*/
+	</script>
+</body>	
+
+
+</html>

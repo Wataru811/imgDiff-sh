@@ -2,6 +2,8 @@
 
 画像差分スクリプト　使い方
 
+複数の画像のセットをまとめて比較し、差分がある画像セットの差分画像を ./res に作成します 
+
 ## Usage
 
 0. imagemagick をインストール
@@ -12,8 +14,15 @@
 5. root/res に差分画像が作成されます
 
 
-## install
+
+## imagemagickのinstall
+
 https://macappstore.org/imagemagick/
+
+(mac へはこの記事が親切)
+https://qiita.com/hiranuma/items/01f3ca4eec4cfcdf1d3f
+
+
 
 ## 注意事項
 
